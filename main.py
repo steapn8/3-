@@ -52,9 +52,14 @@ for id in range(1,11):
         print("\n", book_name)
         list_comments = soup.find_all(class_='texts')
         #print(list_comments)
-        for comment in list_comments:
-            print(comment.find(class_='black').text)
-
+        #for comment in list_comments:
+            #print(comment.find(class_='black').text)
+        genres = []
+        list_genre = soup.find(id = "content").find_all(class_ = "d_book")
+        genres_links = list_genre[1].find_all("a")
+        for genres_link in genres_links:
+            genres.append(genres_link.text)
+        print(genres)
         filepath = f'books/{book_name.strip(  )}.txt'
         
         download_txt(filepath, book_response)
