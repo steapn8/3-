@@ -1,13 +1,16 @@
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 import requests
+from urllib.parse import urlparse
 
-url = 'https://tululu.org/b1/'
+url = 'https://tululu.org/b9/'
 response = requests.get(url)
 response.raise_for_status()
 
 soup = BeautifulSoup(response.text, 'lxml')
-heading = soup.find('h1').text
 
-print("Заголовок:", heading.split("::")[0], "\n", "Автор:", heading.split("::")[1].strip())
+#print(soup.find_all(class_='texts'))
+list_comments = soup.find_all(class_='texts')
 
-
+for comment in list_comments:
+    print(comment.find(class_='black').text)
