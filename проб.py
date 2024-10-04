@@ -8,11 +8,13 @@ response = requests.get(url)
 response.raise_for_status()
 
 soup = BeautifulSoup(response.text, 'lxml')
+payload = 1
 
-#print(soup.find_all(class_='texts'))
-genres = []
-list_genre = soup.find(id = "content").find_all(class_ = "d_book")
-genres_links = list_genre[1].find_all("a")
-for genres_link in genres_links:
-    genres.append(genres_link.text)
-print(genres)
+def download_image(url, payload, soup):
+    url_art = urljoin(url, soup.find(class_='bookimage').find("img")['src'])
+    response = requests.get(url_art, params=payload)
+    response.raise_for_status() 
+    image_url = urljoin(url, soup.find(class_='bookimage').find("img")['src'])
+    filename = urlparse(image_url).path.split("/")[-1]
+    print(url_art)
+download_image(url, payload, soup)
