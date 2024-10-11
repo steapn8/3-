@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 import argparse
-import sys
+
 
 def check_for_redirect(response):
     if response.history :
