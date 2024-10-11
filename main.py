@@ -3,7 +3,8 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from urllib.parse import urlparse
-
+import argparse
+import sys
 
 def check_for_redirect(response):
     if response.history :
@@ -25,6 +26,7 @@ def download_image(payload, image_url):
     filepath = f'image/{filename}'
     with open(filepath, 'wb') as file:
         file.write(response.content)
+
 
 
 def parse_book_page(page_response):
@@ -63,7 +65,15 @@ def parse_book_page(page_response):
 Path("books").mkdir(parents=True, exist_ok=True)
 Path("image").mkdir(parents=True, exist_ok=True)
 
-for id in range(1,11):
+parser = argparse.ArgumentParser(
+    description='программа скачивает книги и изображение с сайта https://tululu.org'
+)
+parser.add_argument ('--start_id', type=int, default=1, help="первая книга" )
+parser.add_argument ('--end_id', type=int, default=11, help="финальная книга")
+args = parser.parse_args()
+
+
+for id in range (args.start_id, args.end_id):
     
     url = "https://tululu.org/txt.php"
     payload = {"id": id}
