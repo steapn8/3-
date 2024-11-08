@@ -61,41 +61,43 @@ def parse_book_page(page_response):
     #print(genres)
     data_from_parsing['genres'] = genres
     return data_from_parsing 
+def main():
+    Path("books").mkdir(parents=True, exist_ok=True)
+    Path("image").mkdir(parents=True, exist_ok=True)
 
-Path("books").mkdir(parents=True, exist_ok=True)
-Path("image").mkdir(parents=True, exist_ok=True)
-
-parser = argparse.ArgumentParser(
-    description='программа скачивает книги и изображение с сайта https://tululu.org'
-)
-parser.add_argument ('--start_id', type=int, default=1, help="первая книга" )
-parser.add_argument ('--end_id', type=int, default=11, help="финальная книга")
-args = parser.parse_args()
+    parser = argparse.ArgumentParser(
+        description='программа скачивает книги и изображение с сайта https://tululu.org'
+    )
+    parser.add_argument ('--start_id', type=int, default=1, help="первая книга" )
+    parser.add_argument ('--end_id', type=int, default=11, help="финальная книга")
+    args = parser.parse_args()
 
 
-for id in range (args.start_id, args.end_id):
-    
-    url = "https://tululu.org/txt.php"
-    payload = {"id": id}
-    try:
+    for id in range (args.start_id, args.end_id):
         
-        book_response = requests.get(url, params=payload)
-        book_response.raise_for_status()
-        check_for_redirect(book_response)
-        page_url = f"https://tululu.org/b{id}"
-        page_response = requests.get(page_url)
-        page_response.raise_for_status()
+        url = "https://tululu.org/txt.php"
+        payload = {"id": id}
+        try:
+            
+            book_response = requests.get(url, params=payload)
+            book_response.raise_for_status()
+            check_for_redirect(book_response)
+            page_url = f"https://tululu.org/b{id}"
+            page_response = requests.get(page_url)
+            page_response.raise_for_status()
 
 
-        parse_book = parse_book_page(page_response)
+            parse_book = parse_book_page(page_response)
 
 
-        filepath = f'books/{parse_book['book_name'].strip(  )}.txt'
-        
-        download_txt(filepath, book_response)
-        download_image(payload, parse_book['image_url'])
+            filepath = f'books/{parse_book['book_name'].strip(  )}.txt'
+            
+            download_txt(filepath, book_response)
+            download_image(payload, parse_book['image_url'])
 
 
-    except requests.HTTPError:
-        print("\n такой книги нет ")
+        except requests.HTTPError:
+            print("\n такой книги нет ")
 
+if __name__ == '__main__':
+    main()
