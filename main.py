@@ -61,7 +61,7 @@ def parse_book_page(page_response):
     #print(genres)
     data_from_parsing['genres'] = genres
     return data_from_parsing 
-def main():
+def main(url):
     Path("books").mkdir(parents=True, exist_ok=True)
     Path("image").mkdir(parents=True, exist_ok=True)
 
@@ -73,10 +73,8 @@ def main():
     args = parser.parse_args()
 
 
-    for id in range (args.start_id, args.end_id):
-        
-        url = "https://tululu.org/txt.php"
-        payload = {"id": id}
+    for book_id in range(args.start_id, args.end_id):
+        payload = {"id": book_id}
         try:
             
             book_response = requests.get(url, params=payload)
@@ -100,4 +98,6 @@ def main():
             print("\n такой книги нет ")
 
 if __name__ == '__main__':
-    main()
+    url = "https://tululu.org/txt.php"
+    main(url)
+    
