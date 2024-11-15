@@ -30,20 +30,16 @@ def download_image(payload, image_url):
 
 
 def parse_book_page(page_response):
-    data_from_parsing = {}
     soup = BeautifulSoup(page_response.text, 'lxml')
-    image_url = urljoin(url, soup.find(class_='bookimage').find("img")['src'])
-    data_from_parsing['image_url'] = image_url
+    image_url = soup.find(class_='bookimage').find("img")['src']
     title_of_book = soup.find('h1')
     division_of_title  = title_of_book.text
     book_name = division_of_title.split('::')[0]
     book_name = book_name.replace(':', '')
     print("\n", book_name)
-    data_from_parsing['book_name'] = book_name
     author = division_of_title.split('::')[1]
     author = author.replace(':', '')
-    print(author)
-    data_from_parsing['author'] = author
+    #print(author)
 
     list_comments = soup.find_all(class_='texts')
     comments = []
@@ -51,7 +47,6 @@ def parse_book_page(page_response):
     for comment in list_comments:
         comments.append(comment.find(class_='black').text)
     #print(comments)
-    data_from_parsing['comments'] = comments
 
     genres = []
     list_genre = soup.find(id = "content").find_all(class_ = "d_book")
@@ -59,9 +54,19 @@ def parse_book_page(page_response):
     for genres_link in genres_links:
         genres.append(genres_link.text)
     #print(genres)
-    data_from_parsing['genres'] = genres
-    return data_from_parsing 
-def main(url):
+    book_parameters = {
+        'image_url':image_url,
+        'book_name':book_name,
+        'author':author,
+        'comments':comments,
+        'genres':genres,
+    }
+    return book_parameters 
+
+
+
+def main():
+    url = "https://tululu.org/txt.php"
     Path("books").mkdir(parents=True, exist_ok=True)
     Path("image").mkdir(parents=True, exist_ok=True)
 
@@ -80,24 +85,27 @@ def main(url):
             book_response = requests.get(url, params=payload)
             book_response.raise_for_status()
             check_for_redirect(book_response)
-            page_url = f"https://tululu.org/b{id}"
+            page_url = f"https://tululu.org/b{book_id}/"
             page_response = requests.get(page_url)
             page_response.raise_for_status()
+            check_for_redirect(page_response)
+
+            book_parameters = parse_book_page(page_response)
 
 
-            parse_book = parse_book_page(page_response)
 
-
-            filepath = f'books/{parse_book['book_name'].strip(  )}.txt'
+            filepath = f'books/{book_parameters['book_name'].strip(  )}.txt'
             
             download_txt(filepath, book_response)
-            download_image(payload, parse_book['image_url'])
+            download_image(payload, page_url + book_parameters['image_url'])
 
 
         except requests.HTTPError:
             print("\n такой книги нет ")
+        except requests.ConnectionError:
+            print("\n Потеря с интернетом.")
 
 if __name__ == '__main__':
-    url = "https://tululu.org/txt.php"
-    main(url)
+    
+    main()
     
