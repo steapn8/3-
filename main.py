@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 import argparse
 
 
+
 def check_for_redirect(response):
     if response.history :
        raise requests.HTTPError
@@ -17,9 +18,9 @@ def download_txt(filepath, response):
         file.write(response.content)
     
 
-def download_image(payload, image_url):
-    
-    response = requests.get(image_url, params=payload)
+def download_image(image_url):
+    print(image_url)
+    response = requests.get(image_url)
     response.raise_for_status() 
     filename = urlparse(image_url).path.split("/")[-1]
 
@@ -34,22 +35,15 @@ def parse_book_page(page_response):
     soup = BeautifulSoup(page_response.text, 'lxml')
     image_url = soup.find(class_='bookimage').find("img")['src']
     title_of_book = soup.find('h1')
-    division_of_title  = title_of_book.text
-    book_name = division_of_title.split('::')[0]
-    book_name = book_name.replace(':', '')
-    author = division_of_title.split('::')[1]
-    author = author.replace(':', '')
+    title_text  = title_of_book.text
+    book_name = title_text.split(' :: ')[0]
+    author = title_text.split(' :: ')[1]
 
     comments_tags = soup.find_all(class_='texts')
     comments = [(comment.find(class_='black').text) for comment in comments_tags ]
-    # for comment in comments:
-    #     comments.append(comment.find(class_='black').text)
 
     genres_tags = soup.find(id = "content").find_all(class_ = "d_book")[1].find_all('a')
     genres = [(genre.text) for genre in genres_tags ]
-    print(genres)
-    # for genre in genres_tags:
-    #     genres.append(genres.text)
     book_parameters = {
         'image_url':image_url,
         'book_name':book_name,
@@ -87,13 +81,13 @@ def main():
             check_for_redirect(page_response)
 
             book_parameters = parse_book_page(page_response)
-
+            image_url = urljoin(page_url, book_parameters['image_url'])
 
 
             filepath = f'books/{book_parameters['book_name'].strip(  )}.txt'
             
             download_txt(filepath, book_response)
-            download_image(payload, page_url + book_parameters['image_url'])
+            download_image(image_url)
 
 
         except requests.HTTPError:
