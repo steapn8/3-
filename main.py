@@ -40,16 +40,16 @@ def parse_book_page(page_response):
     author = division_of_title.split('::')[1]
     author = author.replace(':', '')
 
-    comments = soup.find_all(class_='texts')
-    comments = []
-    for comment in comments:
-        comments.append(comment.find(class_='black').text)
+    comments_tags = soup.find_all(class_='texts')
+    comments = [(comment.find(class_='black').text) for comment in comments_tags ]
+    # for comment in comments:
+    #     comments.append(comment.find(class_='black').text)
 
-    genres = []
-    genre = soup.find(id = "content").find_all(class_ = "d_book")
-    genres = genre[1].find_all("a")
-    for genre in genres:
-        genres.append(genres.text)
+    genres_tags = soup.find(id = "content").find_all(class_ = "d_book")[1].find_all('a')
+    genres = [(genre.text) for genre in genres_tags ]
+    print(genres)
+    # for genre in genres_tags:
+    #     genres.append(genres.text)
     book_parameters = {
         'image_url':image_url,
         'book_name':book_name,
@@ -102,6 +102,5 @@ def main():
             print("\n Потеря с интернетом.")
 
 if __name__ == '__main__':
-    
     main()
     
