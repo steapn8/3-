@@ -40,16 +40,16 @@ def parse_book_page(page_response):
     author = division_of_title.split('::')[1]
     author = author.replace(':', '')
 
-    list_comments = soup.find_all(class_='texts')
+    comments = soup.find_all(class_='texts')
     comments = []
-    for comment in list_comments:
+    for comment in comments:
         comments.append(comment.find(class_='black').text)
 
     genres = []
-    list_genre = soup.find(id = "content").find_all(class_ = "d_book")
-    genres_links = list_genre[1].find_all("a")
-    for genres_link in genres_links:
-        genres.append(genres_link.text)
+    genre = soup.find(id = "content").find_all(class_ = "d_book")
+    genres = genre[1].find_all("a")
+    for genre in genres:
+        genres.append(genres.text)
     book_parameters = {
         'image_url':image_url,
         'book_name':book_name,
