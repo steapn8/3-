@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 import argparse
-
+import time
 
 
 def check_for_redirect(response):
@@ -19,7 +19,6 @@ def download_txt(filepath, response):
     
 
 def download_image(image_url):
-    print(image_url)
     response = requests.get(image_url)
     response.raise_for_status() 
     filename = urlparse(image_url).path.split("/")[-1]
@@ -92,8 +91,10 @@ def main():
 
         except requests.HTTPError:
             print("\n такой книги нет ")
+        
         except requests.ConnectionError:
             print("\n Потеря с интернетом.")
+            time.sleep(5)
 
 if __name__ == '__main__':
     main()
